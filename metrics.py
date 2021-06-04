@@ -35,11 +35,17 @@ def iou_thresholded(y_true, y_pred, threshold=0.5, smooth=1.):
     return (intersection + smooth) / (K.sum(y_true_f) + K.sum(y_pred_f) - intersection + smooth)
 
     
-def jaccard_coef(y_true, y_pred):
+def jaccard_coef_v1(y_true, y_pred):
     intersection = K.sum(y_true * y_pred)
     union = K.sum(y_true + y_pred)
     jac = (intersection + 1.) / (union - intersection + 1.)
     return K.mean(jac)
+
+def jacard_coef_v2(y_true, y_pred):
+    y_true_f = K.flatten(y_true)
+    y_pred_f = K.flatten(y_pred)
+    intersection = K.sum(y_true_f * y_pred_f)
+    return (intersection + 1.0) / (K.sum(y_true_f) + K.sum(y_pred_f) - intersection + 1.0)
 
 
 def dice_coef(y_true, y_pred, smooth=1.):
