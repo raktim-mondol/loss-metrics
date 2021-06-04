@@ -8,6 +8,13 @@ from keras import backend as K
 smooth = 1.
 dropout_rate = 0.5
 
+def iou(y_true, y_pred, smooth=1.):
+    y_true_f = K.flatten(y_true)
+    y_pred_f = K.flatten(y_pred)
+    intersection = K.sum(y_true_f * y_pred_f)
+    return (intersection + smooth) / (K.sum(y_true_f) + K.sum(y_pred_f) - intersection + smooth)
+
+
 def mean_iou(y_true, y_pred):
     prec = []
     for t in np.arange(0.5, 1.0, 0.05):
@@ -19,11 +26,6 @@ def mean_iou(y_true, y_pred):
         prec.append(score)
     return K.mean(K.stack(prec), axis=0)
 
-def iou(y_true, y_pred, smooth=1.):
-    y_true_f = K.flatten(y_true)
-    y_pred_f = K.flatten(y_pred)
-    intersection = K.sum(y_true_f * y_pred_f)
-    return (intersection + smooth) / (K.sum(y_true_f) + K.sum(y_pred_f) - intersection + smooth)
 
 def iou_thresholded(y_true, y_pred, threshold=0.5, smooth=1.):
     y_pred = threshold_binarize(y_pred, threshold)
@@ -40,16 +42,17 @@ def jaccard_coef(y_true, y_pred):
     return K.mean(jac)
 
 
-def threshold_binarize(x, threshold=0.5):
-    ge = tf.greater_equal(x, tf.constant(threshold))
-    y = tf.where(ge, x=tf.ones_like(x), y=tf.zeros_like(x))
-    return y
-
 def dice_coef(y_true, y_pred, smooth=1.):
     y_true_f = K.flatten(y_true)
     y_pred_f = K.flatten(y_pred)
     intersection = K.sum(y_true_f * y_pred_f)
     return (2. * intersection + smooth) / (K.sum(y_true_f) + K.sum(y_pred_f) + smooth)
+
+
+def threshold_binarize(x, threshold=0.5):
+    ge = tf.greater_equal(x, tf.constant(threshold))
+    y = tf.where(ge, x=tf.ones_like(x), y=tf.zeros_like(x))
+    return y
 
 
 def iou_np(y_true, y_pred, smooth=1.):
@@ -72,4 +75,6 @@ def iou_thresholded_np_imgwise(y_true, y_pred, threshold=0.5, smooth=1.):
     intersection = y_true * y_pred_pos   
     union = y_true + y_pred_pos
     return (np.sum(intersection, axis=1) + smooth) / (np.sum(union - intersection, axis=1) + smooth)
+
+
 
