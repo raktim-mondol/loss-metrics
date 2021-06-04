@@ -41,3 +41,7 @@ def jaccard_distance(y_true, y_pred, smooth=100):
     sum_ = K.sum(K.abs(y_true) + K.abs(y_pred), axis=-1)
     jac = (intersection + smooth) / (sum_ - intersection + smooth)
     return (1 - jac) * smooth
+
+
+def bce_dice_loss(y_true, y_pred):
+    return 0.5 * keras.losses.binary_crossentropy(y_true, y_pred) - dice_coef(y_true, y_pred)
