@@ -1,5 +1,5 @@
 from keras import backend as K
-
+from metrics import dice_coef
 
 def jaccard_distance(y_true, y_pred, smooth=100):
     """Jaccard distance for semantic segmentation.
@@ -45,3 +45,7 @@ def jaccard_distance(y_true, y_pred, smooth=100):
 
 def bce_dice_loss(y_true, y_pred):
     return 0.5 * keras.losses.binary_crossentropy(y_true, y_pred) - dice_coef(y_true, y_pred)
+
+def jacard_coef_loss(y_true, y_pred):
+    return -jacard_coef(y_true, y_pred)  # -1 ultiplied as we want to minimize this value as loss function
+
